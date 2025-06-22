@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-to-Round Neckline Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1.1em;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin: 20px 0;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .results {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 25px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .results h3 {
+            color: #2d3748;
+            margin-top: 0;
+            font-size: 1.4em;
+        }
+        
+        .calculation-step {
+            background: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .step-detail {
+            color: #718096;
+            margin: 5px 0;
+        }
+        
+        .highlight {
+            background: #fed7d7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .instructions {
+            background: #e6fffa;
+            border-left: 4px solid #38b2ac;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .instructions h4 {
+            margin-top: 0;
+            color: #234e52;
+        }
+        
+        .phase {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .phase-title {
+            font-weight: 600;
+            color: #0c4a6e;
+            margin-bottom: 10px;
+        }
+        
+        .row-instruction {
+            background: #fef3c7;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧶 V-to-Round Neckline Calculator</h1>
+        
+        <div class="form-group">
+            <label for="stitchGauge">Stitch Gauge (stitches in 4 inches):</label>
+            <input type="number" id="stitchGauge" step="0.5" placeholder="e.g., 16">
+        </div>
+        
+        <div class="form-group">
+            <label for="rowGauge">Row Gauge (rows in 4 inches):</label>
+            <input type="number" id="rowGauge" step="0.5" placeholder="e.g., 24">
+        </div>
+        
+        <div class="form-group">
+            <label for="neckWidth">Desired Width of Neck Opening (inches):</label>
+            <input type="number" id="neckWidth" step="0.25" placeholder="e.g., 8">
+        </div>
+        
+        <div class="form-group">
+            <label for="neckDepth">Desired Total Depth of Neck Opening (inches):</label>
+            <input type="number" id="neckDepth" step="0.25" placeholder="e.g., 4">
+        </div>
+        
+        <button class="calculate-btn" onclick="calculateNeckline()">Calculate My V-to-Round Neckline</button>
+        
+        <div id="results" class="results" style="display: none;">
+            <h3>📏 Your Neckline Calculations</h3>
+            <div id="calculationSteps"></div>
+            
+            <div class="instructions">
+                <h4>🪡 Detailed Knitting Instructions</h4>
+                <div id="knittingInstructions"></div>
+            </div>
+            
+            <div class="instructions">
+                <h4>📐 Visual Diagram</h4>
+                <div id="svgDiagram"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateNeckline() {
+            // Clear any previous results
+            document.getElementById('results').style.display = 'none';
+            
+            const stitchGauge = parseFloat(document.getElementById('stitchGauge').value);
+            const rowGauge = parseFloat(document.getElementById('rowGauge').value);
+            const neckWidth = parseFloat(document.getElementById('neckWidth').value);
+            const neckDepth = parseFloat(document.getElementById('neckDepth').value);
+            
+            console.log('Input values:', {stitchGauge, rowGauge, neckWidth, neckDepth});
+            
+            if (!stitchGauge || !rowGauge || !neckWidth || !neckDepth) {
+                alert('Please fill in all fields to calculate your neckline shaping.');
+                return;
+            }
+            
+            // Validate inputs are positive
+            if (stitchGauge <= 0 || rowGauge <= 0 || neckWidth <= 0 || neckDepth <= 0) {
+                alert('All measurements must be positive numbers.');
+                return;
+            }
+            
+            // Calculate per-inch gauges
+            const stitchesPerInch = stitchGauge / 4;
+            const rowsPerInch = rowGauge / 4;
+            
+            // Calculate total dimensions in stitches and rows
+            const neckWidthStitches = Math.round(neckWidth * stitchesPerInch);
+            const totalDepthRows = Math.round(neckDepth * rowsPerInch);
+            
+            // Calculate V-shaping (replaces 1/3 center bind-off)
+            const vShapingStitches = Math.round(neckWidthStitches / 3);
+            const vShapingRows = Math.ceil(vShapingStitches / 2); // Decreasing 2 sts every other row
+            
+            // Check if there's enough depth for proper shaping
+            const minRowsForRoundShaping = 10; // Need at least 10 rows for 5 decrease actions
+            const requiredTotalRows = vShapingRows + minRowsForRoundShaping;
+            
+            if (totalDepthRows < requiredTotalRows) {
+                const minDepthInches = (requiredTotalRows / rowsPerInch).toFixed(2);
+                alert(`Error: Neckline depth is too shallow!\n\n` +
+                      `Your V-shaping needs ${vShapingRows} rows, plus at least ${minRowsForRoundShaping} rows for round shaping.\n` +
+                      `Total required: ${requiredTotalRows} rows\n` +
+                      `Minimum required depth: ${minDepthInches} inches\n` +
+                      `Current depth: ${neckDepth} inches (${totalDepthRows} rows)\n\n` +
+                      `Please increase your neckline depth to at least ${minDepthInches} inches.`);
+                return;
+            }
+            
+            // Calculate remaining rows for round shaping
+            const roundShapingRows = totalDepthRows - vShapingRows;
+            
+            // Calculate V-shaping dimensions in inches
+            const vShapingWidth = vShapingStitches / stitchesPerInch;
+            const vShapingDepth = vShapingRows / rowsPerInch;
+            
+            // Calculate round shaping decreases per side (1/3 of total width)
+            const roundShapingStitches = Math.round(neckWidthStitches / 3);
+            
+            // Break down round shaping into traditional stairsteps
+            const bindOff3First = 3;
+            const bindOff3Second = 3;
+            const bindOff2First = 2;
+            const bindOff2Second = 2;
+            const decrease1 = 1;
+            
+            const totalRoundShaping = bindOff3First + bindOff3Second + bindOff2First + bindOff2Second + decrease1;
+            
+            // Calculate spacing for round shaping
+            const roundShapingSpacing = Math.max(2, Math.floor(roundShapingRows / 5)); // At least 2 rows between decreases
+            
+            displayResults({
+                stitchesPerInch,
+                rowsPerInch,
+                neckWidthStitches,
+                totalDepthRows,
+                vShapingStitches,
+                vShapingWidth,
+                vShapingRows,
+                vShapingDepth,
+                roundShapingRows,
+                roundShapingStitches,
+                totalRoundShaping,
+                roundShapingSpacing,
+                bindOff3First,
+                bindOff3Second,
+                bindOff2First,
+                bindOff2Second,
+                decrease1
+            });
+        }
+        
+        function displayResults(calc) {
+            const resultsDiv = document.getElementById('results');
+            const stepsDiv = document.getElementById('calculationSteps');
+            const instructionsDiv = document.getElementById('knittingInstructions');
+            
+            stepsDiv.innerHTML = `
+                <div class="calculation-step">
+                    <div class="step-title">📐 Gauge Calculations</div>
+                    <div class="step-detail">Stitches per inch: <span class="highlight">${calc.stitchesPerInch.toFixed(2)}</span></div>
+                    <div class="step-detail">Rows per inch: <span class="highlight">${calc.rowsPerInch.toFixed(2)}</span></div>
+                </div>
+                
+                <div class="calculation-step">
+                    <div class="step-title">📏 Neckline Dimensions</div>
+                    <div class="step-detail">Total neck width: <span class="highlight">${calc.neckWidthStitches} stitches</span></div>
+                    <div class="step-detail">Total depth: <span class="highlight">${calc.totalDepthRows} rows</span></div>
+                </div>
+                
+                <div class="calculation-step">
+                    <div class="step-title">🔺 V-Shaping Phase</div>
+                    <div class="step-detail">V-shaping stitches (1/3 of width): <span class="highlight">${calc.vShapingStitches} stitches</span></div>
+                    <div class="step-detail">V-shaping width: <span class="highlight">${calc.vShapingWidth.toFixed(2)} inches</span></div>
+                    <div class="step-detail">V-shaping rows: <span class="highlight">${calc.vShapingRows} rows</span></div>
+                    <div class="step-detail">V-shaping depth: <span class="highlight">${calc.vShapingDepth.toFixed(2)} inches</span></div>
+                    <div class="step-detail">Decreases: 2 stitches every other row</div>
+                </div>
+                
+                <div class="calculation-step">
+                    <div class="step-title">⭕ Round Shaping Phase</div>
+                    <div class="step-detail">Remaining rows: <span class="highlight">${calc.roundShapingRows} rows</span></div>
+                    <div class="step-detail">Decreases per side: <span class="highlight">${calc.totalRoundShaping} stitches</span></div>
+                    <div class="step-detail">Stairsteps: 3-3-2-2-1 stitches</div>
+                </div>
+            `;
+            
+            // Generate detailed row-by-row instructions
+            let rowCount = 1;
+            let instructions = '';
+            
+            // V-shaping instructions
+            instructions += `<div class="phase">
+                <div class="phase-title">Phase 1: V-Shaping (Rows ${rowCount} to ${calc.vShapingRows})</div>
+                <p><strong>Setup:</strong> Place marker at center front</p>`;
+            
+            for (let i = 0; i < calc.vShapingRows; i++) {
+                if (i % 2 === 0) {
+                    instructions += `<div class="row-instruction">Row ${rowCount}: Decrease 1 st each side of center marker</div>`;
+                } else {
+                    instructions += `<div class="row-instruction">Row ${rowCount}: Work even</div>`;
+                }
+                rowCount++;
+            }
+            instructions += `</div>`;
+            
+            // Round shaping instructions
+            instructions += `<div class="phase">
+                <div class="phase-title">Phase 2: Round Shaping (Rows ${rowCount} onward)</div>
+                <p><strong>Work each shoulder separately from this point</strong></p>`;
+            
+            const decreaseActions = [
+                { action: `Bind off ${calc.bindOff3First} sts`, side: 'both' },
+                { action: `Bind off ${calc.bindOff3Second} sts`, side: 'both' },
+                { action: `Bind off ${calc.bindOff2First} sts`, side: 'both' },
+                { action: `Bind off ${calc.bindOff2Second} sts`, side: 'both' },
+                { action: `Decrease 1 st`, side: 'both' }
+            ];
+            
+            decreaseActions.forEach((step, index) => {
+                const rowNum = rowCount + (index * Math.max(2, calc.roundShapingSpacing));
+                instructions += `<div class="row-instruction">Around Row ${rowNum}: ${step.action} at neck edge (each shoulder)</div>`;
+            });
+            
+            instructions += `<div class="row-instruction">Continue to Row ${calc.totalDepthRows}: Work even to complete neckline depth</div>`;
+            instructions += `</div>`;
+            
+            // Summary
+            instructions += `<div class="phase">
+                <div class="phase-title">Summary</div>
+                <p><strong>Right Shoulder:</strong> Work decreases at beginning of RS rows</p>
+                <p><strong>Left Shoulder:</strong> Work decreases at beginning of WS rows</p>
+                <p><strong>Total Depth:</strong> ${calc.totalDepthRows} rows</p>
+                <p><strong>Each shoulder decreases:</strong> ${calc.totalRoundShaping} stitches over ${calc.roundShapingRows} rows</p>
+            </div>`;
+            
+            instructionsDiv.innerHTML = instructions;
+            
+            // Generate SVG diagram
+            generateSVGDiagram(calc);
+            
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function generateSVGDiagram(calc) {
+            const svgDiv = document.getElementById('svgDiagram');
+            
+            // SVG dimensions and scaling
+            const svgWidth = 600;
+            const svgHeight = 400;
+            const scale = 30; // pixels per inch
+            
+            // Calculate positions
+            const centerX = svgWidth / 2;
+            const topY = 50;
+            const neckWidthPx = calc.neckWidthStitches / calc.stitchesPerInch * scale;
+            const totalDepthPx = calc.totalDepthRows / calc.rowsPerInch * scale;
+            const vDepthPx = calc.vShapingRows / calc.rowsPerInch * scale;
+            const vWidthPx = calc.vShapingStitches / calc.stitchesPerInch * scale;
+            
+            // Define key points
+            const shoulderLeftX = centerX - neckWidthPx / 2;
+            const shoulderRightX = centerX + neckWidthPx / 2;
+            const vTopY = topY;
+            const vBottomY = topY + vDepthPx;
+            const neckBottomY = topY + totalDepthPx;
+            
+            const svg = `
+                <svg width="${svgWidth}" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background -->
+                    <rect width="${svgWidth}" height="${svgHeight}" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+                    
+                    <!-- Garment outline -->
+                    <rect x="50" y="${topY}" width="${svgWidth - 100}" height="${totalDepthPx + 50}" 
+                          fill="#e0f2fe" stroke="#0369a1" stroke-width="2" stroke-dasharray="5,5" opacity="0.3"/>
+                    
+                    <!-- V-shaping area -->
+                    <polygon points="${centerX},${vTopY} ${centerX - vWidthPx/2},${vBottomY} ${centerX + vWidthPx/2},${vBottomY}" 
+                             fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                    
+                    <!-- Round shaping curves -->
+                    <path d="M ${centerX - vWidthPx/2} ${vBottomY} 
+                             Q ${shoulderLeftX} ${vBottomY + (neckBottomY - vBottomY)/2} ${shoulderLeftX} ${neckBottomY}"
+                          fill="none" stroke="#dc2626" stroke-width="3"/>
+                    <path d="M ${centerX + vWidthPx/2} ${vBottomY} 
+                             Q ${shoulderRightX} ${vBottomY + (neckBottomY - vBottomY)/2} ${shoulderRightX} ${neckBottomY}"
+                          fill="none" stroke="#dc2626" stroke-width="3"/>
+                    
+                    <!-- Measurement lines and labels -->
+                    
+                    <!-- Total width -->
+                    <line x1="${shoulderLeftX}" y1="${topY - 20}" x2="${shoulderRightX}" y1="${topY - 20}" 
+                          stroke="#374151" stroke-width="1"/>
+                    <line x1="${shoulderLeftX}" y1="${topY - 25}" x2="${shoulderLeftX}" y1="${topY - 15}" 
+                          stroke="#374151" stroke-width="1"/>
+                    <line x1="${shoulderRightX}" y1="${topY - 25}" x2="${shoulderRightX}" y1="${topY - 15}" 
+                          stroke="#374151" stroke-width="1"/>
+                    <text x="${centerX}" y="${topY - 25}" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">
+                        Total Width: ${(calc.neckWidthStitches / calc.stitchesPerInch).toFixed(2)}" (${calc.neckWidthStitches} sts)
+                    </text>
+                    
+                    <!-- V-width -->
+                    <line x1="${centerX - vWidthPx/2}" y1="${vBottomY + 15}" x2="${centerX + vWidthPx/2}" y1="${vBottomY + 15}" 
+                          stroke="#f59e0b" stroke-width="2"/>
+                    <text x="${centerX}" y="${vBottomY + 30}" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#f59e0b">
+                        V-Width: ${calc.vShapingWidth.toFixed(2)}" (${calc.vShapingStitches} sts)
+                    </text>
+                    
+                    <!-- Total depth -->
+                    <line x1="${svgWidth - 30}" y1="${topY}" x2="${svgWidth - 30}" y1="${neckBottomY}" 
+                          stroke="#374151" stroke-width="1"/>
+                    <line x1="${svgWidth - 35}" y1="${topY}" x2="${svgWidth - 25}" y1="${topY}" 
+                          stroke="#374151" stroke-width="1"/>
+                    <line x1="${svgWidth - 35}" y1="${neckBottomY}" x2="${svgWidth - 25}" y1="${neckBottomY}" 
+                          stroke="#374151" stroke-width="1"/>
+                    <text x="${svgWidth - 15}" y="${(topY + neckBottomY) / 2}" text-anchor="start" font-family="Arial" font-size="12" font-weight="bold" 
+                          transform="rotate(90, ${svgWidth - 15}, ${(topY + neckBottomY) / 2})">
+                        Total: ${(calc.totalDepthRows / calc.rowsPerInch).toFixed(2)}" (${calc.totalDepthRows} rows)
+                    </text>
+                    
+                    <!-- V-depth -->
+                    <line x1="20" y1="${vTopY}" x2="20" y1="${vBottomY}" 
+                          stroke="#f59e0b" stroke-width="2"/>
+                    <line x1="15" y1="${vTopY}" x2="25" y1="${vTopY}" 
+                          stroke="#f59e0b" stroke-width="2"/>
+                    <line x1="15" y1="${vBottomY}" x2="25" y1="${vBottomY}" 
+                          stroke="#f59e0b" stroke-width="2"/>
+                    <text x="5" y="${(vTopY + vBottomY) / 2}" text-anchor="start" font-family="Arial" font-size="11" font-weight="bold" fill="#f59e0b"
+                          transform="rotate(90, 5, ${(vTopY + vBottomY) / 2})">
+                        V: ${calc.vShapingDepth.toFixed(2)}" (${calc.vShapingRows} rows)
+                    </text>
+                    
+                    <!-- Round shaping depth -->
+                    <line x1="45" y1="${vBottomY}" x2="45" y1="${neckBottomY}" 
+                          stroke="#dc2626" stroke-width="2"/>
+                    <text x="35" y="${(vBottomY + neckBottomY) / 2}" text-anchor="start" font-family="Arial" font-size="11" font-weight="bold" fill="#dc2626"
+                          transform="rotate(90, 35, ${(vBottomY + neckBottomY) / 2})">
+                        Round: ${((calc.totalDepthRows - calc.vShapingRows) / calc.rowsPerInch).toFixed(2)}" (${calc.roundShapingRows} rows)
+                    </text>
+                    
+                    <!-- Legend -->
+                    <rect x="400" y="${neckBottomY + 60}" width="180" height="80" fill="white" stroke="#d1d5db" stroke-width="1" rx="5"/>
+                    <text x="410" y="${neckBottomY + 80}" font-family="Arial" font-size="12" font-weight="bold">Legend:</text>
+                    <rect x="410" y="${neckBottomY + 85}" width="15" height="10" fill="#fef3c7" stroke="#f59e0b"/>
+                    <text x="430" y="${neckBottomY + 94}" font-family="Arial" font-size="10">V-Shaping</text>
+                    <line x1="410" y1="${neckBottomY + 105}" x2="425" y1="${neckBottomY + 105}" stroke="#dc2626" stroke-width="3"/>
+                    <text x="430" y="${neckBottomY + 109}" font-family="Arial" font-size="10">Round Shaping</text>
+                    <rect x="410" y="${neckBottomY + 115}" width="15" height="10" fill="#e0f2fe" stroke="#0369a1" stroke-dasharray="2,2"/>
+                    <text x="430" y="${neckBottomY + 124}" font-family="Arial" font-size="10">Garment Body</text>
+                    
+                    <!-- Center line -->
+                    <line x1="${centerX}" y1="${topY}" x2="${centerX}" y1="${neckBottomY + 40}" 
+                          stroke="#6b7280" stroke-width="1" stroke-dasharray="3,3"/>
+                    <text x="${centerX + 5}" y="${neckBottomY + 35}" font-family="Arial" font-size="10" fill="#6b7280">Center Front</text>
+                </svg>
+            `;
+            
+            svgDiv.innerHTML = svg;
+        }
+    </script>
+</body>
+</html>
